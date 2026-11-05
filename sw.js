@@ -1,11 +1,12 @@
 // Offline cache for the app (Mike, 11 Oct 2026): practise without a connection, progress syncs later.
 // Phương's recordings: cache first (they never change under the same name; a corrected line gets a new build anyway,
 // and the cache is renewed with every new version). The page: network first, the cached copy only when offline.
-// version.json and Firebase always go to the network.
-const CACHE = "phuong-v2";
+// version.json and Firebase always go to the network. The Chinese app (deutschmitmike.github.io/chinese/) shares
+// the origin, so this worker only ever deletes its own caches ("phuong-…"), since 5 Nov 2026.
+const CACHE = "phuong-v3";
 self.addEventListener("install", e => { self.skipWaiting(); });
 self.addEventListener("activate", e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith("phuong-") && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 self.addEventListener("fetch", e => {
   const url = new URL(e.request.url);
